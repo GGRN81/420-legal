@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+  <head><script>
+  if (window.location.hostname.startsWith('preview-')) {
+    const originalMethods = {
+      log: console.log,
+      warn: console.warn,
+      error: console.error,
+      info: console.info
+    };
+
+    ['log', 'warn', 'error', 'info'].forEach(method => {
+      console[method] = function(...args) {
+        originalMethods[method].apply(console, args);
+
+        const messageData = {
+          type: 'console',
+          method: method,
+          args: args
+        };
+
+        if (method === 'error') {
+          const errorArg = args.find(arg => arg instanceof Error);
+          if (errorArg && errorArg.stack) {
+            messageData.args = args.map(arg => {
+              if (arg instanceof Error) {
+                return {
+                  message: arg.message,
+                  stack: arg.stack,
+                  name: arg.name
+                };
+              }
+              return arg;
+            });
+          } else {
+            try {
+              throw new Error("Stack trace");
+            } catch (e) {
+              if (e instanceof Error) {
+                const stackLines = e.stack ? e.stack.split('\n') : [];
+                stackLines.splice(1, 1);
+                const enhancedStack = stackLines.join('\n');
+
+                messageData.args = [...args, {
+                  _synthetic: true,
+                  stack: enhancedStack
+                }];
+              }
+            }
+          }
+        }
+
+        if (window.parent) {
+          window.parent.postMessage(messageData, '*');
+        }
+      };
+    });
+  }
+</script>
+
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/placeholder.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Servicios Legales Profesionales | Constitución, Marcas, Contratos</title>
+    <meta name="description" content="Servicios legales profesionales: constitución de empresas, registro de marcas, contratos legales y asesoría fiscal. Anticipo desde $1,500 MXN." />
+    <meta name="keywords" content="servicios legales, constitución empresa, registro marca, contratos legales, asesoría fiscal, México" />
+    <meta property="og:title" content="Servicios Legales Profesionales" />
+    <meta property="og:description" content="Constitución de empresas, registro de marcas, contratos legales. Anticipo desde $1,500 MXN." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://tu-dominio.com" />
+    <script type="module" crossorigin src="/assets/index-CTWucmst.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-D5gZQUhB.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
